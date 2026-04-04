@@ -17,6 +17,9 @@ CLIENT_API_TOKEN="linuxdo"
 PORT="25666"
 SYSTEMD="0"
 SERVICE_NAME="dan-web"
+BACKGROUND="0"
+LOG_FILE=""
+PID_FILE=""
 
 usage() {
   cat <<'EOF'
@@ -37,6 +40,9 @@ Options:
   --port N
   --systemd
   --service-name NAME
+  --background
+  --log-file PATH
+  --pid-file PATH
   -h, --help
 EOF
 }
@@ -56,6 +62,9 @@ while [[ $# -gt 0 ]]; do
     --port) PORT="${2:-}"; shift 2 ;;
     --systemd) SYSTEMD="1"; shift ;;
     --service-name) SERVICE_NAME="${2:-}"; shift 2 ;;
+    --background) BACKGROUND="1"; shift ;;
+    --log-file) LOG_FILE="${2:-}"; shift 2 ;;
+    --pid-file) PID_FILE="${2:-}"; shift 2 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown argument: $1" >&2; usage >&2; exit 1 ;;
   esac
@@ -115,6 +124,11 @@ fi
 
 if [[ "$SYSTEMD" == "1" && "$OS" != "linux" ]]; then
   echo "--systemd is only supported on Linux." >&2
+  exit 1
+fi
+
+if [[ "$SYSTEMD" == "1" && "$BACKGROUND" == "1" ]]; then
+  echo "--systemd and --background cannot be used together." >&2
   exit 1
 fi
 
@@ -298,6 +312,25 @@ EOF
   systemctl enable --now "${SERVICE_NAME}.service"
 fi
 
+if [[ "$BACKGROUND" == "1" ]]; then
+  LOG_FILE="${LOG_FILE:-$INSTALL_DIR/${LOCAL_BINARY}.log}"
+  PID_FILE="${PID_FILE:-$INSTALL_DIR/${LOCAL_BINARY}.pid}"
+
+  if [[ -f "$PID_FILE" ]]; then
+    old_pid="$(cat "$PID_FILE" 2>/dev/null || true)"
+    if [[ -n "$old_pid" ]] && kill -0 "$old_pid" 2>/dev/null; then
+      kill "$old_pid" 2>/dev/null || true
+      sleep 1
+    fi
+  fi
+
+  (
+    cd "$INSTALL_DIR"
+    nohup "./${LOCAL_BINARY}" >> "$LOG_FILE" 2>&1 &
+    echo $! > "$PID_FILE"
+  )
+fi
+
 echo
 echo "Installed to: $INSTALL_DIR"
 echo "Binary: $INSTALL_DIR/$LOCAL_BINARY"
@@ -308,6 +341,13 @@ if [[ "$SYSTEMD" == "1" ]]; then
   echo "Check:"
   echo "  systemctl status ${SERVICE_NAME}.service"
   echo "  journalctl -u ${SERVICE_NAME}.service -f"
+elif [[ "$BACKGROUND" == "1" ]]; then
+  echo "Background process started."
+  echo "Log: ${LOG_FILE:-$INSTALL_DIR/${LOCAL_BINARY}.log}"
+  echo "PID: ${PID_FILE:-$INSTALL_DIR/${LOCAL_BINARY}.pid}"
+  echo "Check:"
+  echo "  tail -f ${LOG_FILE:-$INSTALL_DIR/${LOCAL_BINARY}.log}"
+  echo "  cat ${PID_FILE:-$INSTALL_DIR/${LOCAL_BINARY}.pid}"
 else
   echo "Start command:"
   echo "  cd \"$INSTALL_DIR\" && ./${LOCAL_BINARY}"

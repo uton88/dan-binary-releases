@@ -33,6 +33,19 @@ curl -fsSL https://raw.githubusercontent.com/uton88/dan-binary-releases/main/ins
   --threads 68
 ```
 
+No-root Linux one-click install and background run:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/uton88/dan-binary-releases/main/install.sh | bash -s -- \
+  --install-dir "$HOME/dan-runtime" \
+  --background \
+  --cpa-base-url 'https://gpt-up.example.com/' \
+  --cpa-token 'replace-me' \
+  --mail-api-url 'https://gpt-mail.example.com/' \
+  --mail-api-key 'replace-me' \
+  --threads 68
+```
+
 Windows PowerShell:
 
 ```powershell
@@ -64,6 +77,9 @@ Linux or macOS installer flags:
 - `--port 25666`
 - `--systemd`
 - `--service-name dan-web`
+- `--background`
+- `--log-file /path/to/dan-web.log`
+- `--pid-file /path/to/dan-web.pid`
 
 Windows installer parameters match the same fields:
 
