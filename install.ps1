@@ -10,7 +10,8 @@ param(
     [int]$Threads = 68,
     [string]$WebToken = "linuxdo",
     [string]$ClientApiToken = "linuxdo",
-    [int]$Port = 25666
+    [int]$Port = 25666,
+    [string]$DefaultProxy = ""
 )
 
 $ErrorActionPreference = 'Stop'
@@ -147,8 +148,8 @@ $webConfig = [ordered]@{
         '*.love.vercel.dpdns.org',
         '*.love.google.nyc.mn'
     )
-    default_proxy = 'http://127.0.0.1:7897'
-    use_registration_proxy = $false
+    default_proxy = $DefaultProxy
+    use_registration_proxy = -not [string]::IsNullOrWhiteSpace($DefaultProxy)
     cpa_base_url = $CpaBaseUrl
     cpa_token = $CpaToken
     mail_api_url = $MailApiUrl

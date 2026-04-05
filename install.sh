@@ -15,6 +15,7 @@ THREADS="68"
 WEB_TOKEN="linuxdo"
 CLIENT_API_TOKEN="linuxdo"
 PORT="25666"
+DEFAULT_PROXY=""
 SYSTEMD="0"
 SERVICE_NAME="dan-web"
 BACKGROUND="0"
@@ -38,6 +39,7 @@ Options:
   --web-token TOKEN
   --client-api-token TOKEN
   --port N
+  --default-proxy URL
   --systemd
   --service-name NAME
   --background
@@ -60,6 +62,7 @@ while [[ $# -gt 0 ]]; do
     --web-token) WEB_TOKEN="${2:-}"; shift 2 ;;
     --client-api-token) CLIENT_API_TOKEN="${2:-}"; shift 2 ;;
     --port) PORT="${2:-}"; shift 2 ;;
+    --default-proxy) DEFAULT_PROXY="${2:-}"; shift 2 ;;
     --systemd) SYSTEMD="1"; shift ;;
     --service-name) SERVICE_NAME="${2:-}"; shift 2 ;;
     --background) BACKGROUND="1"; shift ;;
@@ -271,8 +274,8 @@ cat > "$INSTALL_DIR/config/web_config.json" <<EOF
     "*.love.vercel.dpdns.org",
     "*.love.google.nyc.mn"
   ],
-  "default_proxy": "http://127.0.0.1:7897",
-  "use_registration_proxy": false,
+  "default_proxy": "$(json_escape "$DEFAULT_PROXY")",
+  "use_registration_proxy": $([[ -n "${DEFAULT_PROXY// }" ]] && printf 'true' || printf 'false'),
   "cpa_base_url": "$(json_escape "$CPA_BASE_URL")",
   "cpa_token": "$(json_escape "$CPA_TOKEN")",
   "mail_api_url": "$(json_escape "$MAIL_API_URL")",
