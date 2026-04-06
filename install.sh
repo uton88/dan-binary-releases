@@ -12,6 +12,8 @@ CPA_TOKEN=""
 MAIL_API_URL=""
 MAIL_API_KEY=""
 THREADS="68"
+OTP_RETRY_COUNT="12"
+OTP_RETRY_INTERVAL_SECONDS="5"
 WEB_TOKEN="linuxdo"
 CLIENT_API_TOKEN="linuxdo"
 PORT="25666"
@@ -37,6 +39,8 @@ Options:
   --mail-api-url URL
   --mail-api-key KEY
   --threads N
+  --otp-retry-count N
+  --otp-retry-interval-seconds N
   --web-token TOKEN
   --client-api-token TOKEN
   --port N
@@ -60,6 +64,8 @@ while [[ $# -gt 0 ]]; do
     --mail-api-url) MAIL_API_URL="${2:-}"; shift 2 ;;
     --mail-api-key) MAIL_API_KEY="${2:-}"; shift 2 ;;
     --threads) THREADS="${2:-}"; shift 2 ;;
+    --otp-retry-count) OTP_RETRY_COUNT="${2:-}"; shift 2 ;;
+    --otp-retry-interval-seconds) OTP_RETRY_INTERVAL_SECONDS="${2:-}"; shift 2 ;;
     --web-token) WEB_TOKEN="${2:-}"; shift 2 ;;
     --client-api-token) CLIENT_API_TOKEN="${2:-}"; shift 2 ;;
     --port) PORT="${2:-}"; shift 2 ;;
@@ -252,8 +258,8 @@ cat > "$INSTALL_DIR/config/web_config.json" <<EOF
   "check_interval_minutes": 1,
   "manual_default_threads": ${THREADS},
   "manual_register_retries": 3,
-  "otp_retry_count": 12,
-  "otp_retry_interval_seconds": 5,
+  "otp_retry_count": ${OTP_RETRY_COUNT},
+  "otp_retry_interval_seconds": ${OTP_RETRY_INTERVAL_SECONDS},
   "web_token": "$(json_escape "$WEB_TOKEN")",
   "client_api_token": "$(json_escape "$CLIENT_API_TOKEN")",
   "client_notice": "",

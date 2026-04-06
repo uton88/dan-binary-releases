@@ -57,7 +57,9 @@ curl -fsSL https://raw.githubusercontent.com/uton88/dan-binary-releases/main/ins
   --cpa-token 'replace-me' \
   --mail-api-url 'https://gpt-mail.example.com/' \
   --mail-api-key 'replace-me' \
-  --threads 68
+  --threads 68 \
+  --otp-retry-count 12 \
+  --otp-retry-interval-seconds 5
 ```
 
 Windows PowerShell:
@@ -93,6 +95,8 @@ Linux or macOS installer flags:
 - `--mail-api-url URL`
 - `--mail-api-key KEY`
 - `--threads 68`
+- `--otp-retry-count 12`
+- `--otp-retry-interval-seconds 5`
 - `--web-token linuxdo`
 - `--client-api-token linuxdo`
 - `--port 25666`
@@ -113,6 +117,8 @@ Windows installer parameters match the same fields:
 - `-MailApiUrl`
 - `-MailApiKey`
 - `-Threads`
+- `-OtpRetryCount`
+- `-OtpRetryIntervalSeconds`
 - `-WebToken`
 - `-ClientApiToken`
 - `-Port`
