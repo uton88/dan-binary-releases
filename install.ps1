@@ -8,8 +8,6 @@ param(
     [string]$MailApiUrl = "",
     [string]$MailApiKey = "",
     [int]$Threads = 68,
-    [int]$OtpRetryCount = 12,
-    [int]$OtpRetryIntervalSeconds = 5,
     [string]$WebToken = "linuxdo",
     [string]$ClientApiToken = "linuxdo",
     [int]$Port = 25666,
@@ -20,24 +18,6 @@ $ErrorActionPreference = 'Stop'
 
 $repoOwner = 'uton88'
 $repoName = 'dan-binary-releases'
-$defaultDomainsApiUrl = 'https://gpt-up.icoa.pp.ua/v0/management/domains'
-
-function Resolve-DomainsApiUrl {
-    param([string]$BaseUrl)
-
-    if ([string]::IsNullOrWhiteSpace($BaseUrl)) {
-        return $defaultDomainsApiUrl
-    }
-
-    $trimmed = $BaseUrl.Trim().TrimEnd('/')
-    if ($trimmed.EndsWith('/v0/management/domains', [System.StringComparison]::OrdinalIgnoreCase)) {
-        return $trimmed
-    }
-    if ($trimmed.EndsWith('/v0/management', [System.StringComparison]::OrdinalIgnoreCase)) {
-        return "$trimmed/domains"
-    }
-    return "$trimmed/v0/management/domains"
-}
 
 switch ($Component) {
     'dan' {}
@@ -74,14 +54,6 @@ if ($actualHash -ne $expectedHash.ToLowerInvariant()) {
     throw "Checksum verification failed for $assetName"
 }
 
-$domainsApiUrl = Resolve-DomainsApiUrl $CpaBaseUrl
-Write-Host "Fetching domains from: $domainsApiUrl"
-$domainsPayload = Invoke-RestMethod $domainsApiUrl
-$domains = @($domainsPayload.domains | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
-if ($domains.Count -eq 0) {
-    throw "Domains API returned an empty or invalid domains list: $domainsApiUrl"
-}
-
 $config = [ordered]@{
     ak_file = 'ak.txt'
     rk_file = 'rk.txt'
@@ -105,14 +77,12 @@ $webConfig = [ordered]@{
     check_interval_minutes = 1
     manual_default_threads = $Threads
     manual_register_retries = 3
-    otp_retry_count = $OtpRetryCount
-    otp_retry_interval_seconds = $OtpRetryIntervalSeconds
+    otp_retry_count = 12
+    otp_retry_interval_seconds = 5
     web_token = $WebToken
     client_api_token = $ClientApiToken
     client_notice = ''
     minimum_client_version = ''
-    enabled_email_domains = $domains
-    mail_domain_options = $domains
     default_proxy = $DefaultProxy
     use_registration_proxy = -not [string]::IsNullOrWhiteSpace($DefaultProxy)
     cpa_base_url = $CpaBaseUrl
