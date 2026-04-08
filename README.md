@@ -75,6 +75,7 @@ Linux or macOS installer flags:
 - `--web-token linuxdo`
 - `--client-api-token linuxdo`
 - `--port 25666`
+- omit `--default-proxy` to keep `default_proxy` empty and `use_registration_proxy=false`
 - `--systemd`
 - `--service-name dan-web`
 - `--background`
@@ -115,6 +116,6 @@ The release publishes these binaries:
 
 ## Current published version
 
-- latest tag: `v0.1.10`
-- source repository: `https://github.com/uton88/OAI-REG-WEB-GO/releases/tag/v0.1.10`
-- public binary release: `https://github.com/uton88/dan-binary-releases/releases/tag/v0.1.10`
+- latest tag: `v0.1.11`
+- source repository: `https://github.com/uton88/OAI-REG-WEB-GO/releases/tag/v0.1.11`
+- public binary release: `https://github.com/uton88/dan-binary-releases/releases/tag/v0.1.11`
